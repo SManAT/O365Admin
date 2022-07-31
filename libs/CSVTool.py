@@ -72,3 +72,8 @@ class CSVTool():
                          header=0,
                          names=['Employee', 'Hired', 'Salary', 'Sick Days'])
     df.to_csv('hrdata_modified.csv')
+
+  def save(self, filename, data):
+    """ Write data to a CSV File """
+    df = pandas.DataFrame([vars(c) for c in data])
+    df.to_csv(filename, sep=";")

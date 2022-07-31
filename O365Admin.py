@@ -12,6 +12,8 @@ from libs.CSVTool import CSVTool
 from libs.AzurePS import AzurePS
 import questionary
 from libs.Questions import Questions
+from rich.table import Table
+from rich.console import Console
 
 
 class O365():
@@ -218,18 +220,81 @@ class O365():
 
     def sync(self):
       """ Azure und Sokrates abgleichen """
-      pass
-      
-      
+      delete = []
+      azure = self.db.loadAzureTable()
+      sokrates = self.db.loadSokratesTable()
+
+      for aUser in azure:
+        print(".", end="")
+        found = False
+
+        # keine Lehrer keine Vips
+        if aUser.licenses == 'L' or aUser.licenses == 'V':
+          found = True
+        else:
+          for sUser in sokrates:
+            if self.compare(aUser, sUser):
+              found = True
+              break
+
+        if found is False:
+          # gibt es nicht mehr
+          delete.append(aUser)
+
+      self.printTable(delete)
+      # save it
+      csv = CSVTool()
+      path = os.path.join(self.rootDir, "deleteUsers.csv")
+      csv.save(path, delete)
+
+    def printTable(self, data):
+      table = Table(title="Users that may deleted")
+      table.add_column("Nr", style="cyan", no_wrap=True)
+      table.add_column("Vorname", style="magenta")
+      table.add_column("Nachname", style="green")
+
+      i = 1
+      for item in data:
+        table.add_row(str(i), str(item.vorname), str(item.nachname))
+        i += 1
+
+      console = Console()
+      console.print(table)
+
+    def compare(self, aUser, sUser):
+      """ compare Azure User against sUser """
+      avorname = aUser.vorname
+      anachname = aUser.nachname
+
+      svorname = sUser.vorname
+      snachname = sUser.nachname
+
+      if avorname.lower() == svorname.lower() and anachname.lower() == snachname.lower():
+        return True
+      # Vor-Nachname tauschen
+      if avorname.lower() == snachname.lower() and anachname.lower() == svorname.lower():
+        return True
+      return False
+
+    #!!!!!!!!!!!! ó = o
+    # VIPS fehlen# H.Dietl-L	Johannes	STANDARDWOFFPACK_IW_FACULTY
+
+
 
 def start():
+  debug = True
+
   o365 = O365()
   lastdates = []
   lastdates.append(o365.db.getLastDBUpdate('azure'))
   lastdates.append(o365.db.getLastDBUpdate('sokrates'))
 
-  questions = Questions()
-  a = questions.MainMenue(lastdates)
+  if debug is False:
+    questions = Questions()
+    a = questions.MainMenue(lastdates)
+
+  if debug is True:
+    a = 'sync'
 
   if a == 'getazure':
     o365.azureUpdate()

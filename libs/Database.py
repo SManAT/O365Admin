@@ -2,6 +2,8 @@ import sqlite3
 from sqlite3 import Error
 import datetime
 from rich.progress import Progress
+from libs.UserObj import UserObj
+from libs.UserSokrates import UserSokrates
 
 
 class Database():
@@ -157,3 +159,37 @@ class Database():
         return dt_object.strftime("%d.%m.%Y")
       else:
         return None
+
+    def loadAzureTable(self):
+      self.connect()
+      cmd = "SELECT * FROM azure"
+      result = self.cursor.execute(cmd)
+      data = result.fetchall()
+      self.close()
+
+      erg = []
+      for o in data:
+        user = UserObj()
+        user.vorname = o[1]
+        user.nachname = o[2]
+        user.mail = o[3]
+        user.licenses = o[4]
+
+        erg.append(user)
+      return erg
+
+    def loadSokratesTable(self):
+      self.connect()
+      cmd = "SELECT * FROM sokrates"
+      result = self.cursor.execute(cmd)
+      data = result.fetchall()
+      self.close()
+
+      erg = []
+      for o in data:
+        user = UserSokrates()
+        user.vorname = o[1]
+        user.nachname = o[2]
+
+        erg.append(user)
+      return erg

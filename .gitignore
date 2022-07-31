@@ -141,3 +141,4 @@ scripts/**
 *.csv
 psDebugging.ps1
 
+*.csv#

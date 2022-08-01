@@ -278,6 +278,11 @@ class O365():
 
     #!!!!!!!!!!!! ó = o
     # VIPS fehlen# H.Dietl-L	Johannes	STANDARDWOFFPACK_IW_FACULTY
+    # Odegaard      Doppelnamen
+    # Paulina Lara  Doppelnamen
+    # Zalan > Zalán
+
+
 
 
 

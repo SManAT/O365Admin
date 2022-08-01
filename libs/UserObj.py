@@ -2,7 +2,8 @@
 class UserObj:
     lic = {
       'M365EDU_A3_FACULTY': 'L',
-      'M365EDU_A3_STUUSEBNFT': 'S'
+      'M365EDU_A3_STUUSEBNFT': 'S',
+      'STANDARDWOFFPACK_IW_FACULT': 'V'
     }
 
     displayName = ""

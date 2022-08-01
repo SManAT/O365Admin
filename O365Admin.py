@@ -14,6 +14,7 @@ import questionary
 from libs.Questions import Questions
 from rich.table import Table
 from rich.console import Console
+from libs.Compare import Compare
 
 
 class O365():
@@ -223,23 +224,13 @@ class O365():
       delete = []
       azure = self.db.loadAzureTable()
       sokrates = self.db.loadSokratesTable()
-
-      for aUser in azure:
-        print(".", end="")
-        found = False
-
-        # keine Lehrer keine Vips
-        if aUser.licenses == 'L' or aUser.licenses == 'V':
-          found = True
-        else:
-          for sUser in sokrates:
-            if self.compare(aUser, sUser):
-              found = True
-              break
-
-        if found is False:
-          # gibt es nicht mehr
-          delete.append(aUser)
+      
+      compare = Compare(azure, sokrates)
+      compare.start()
+      # block until finished
+      compare.getThread().join()
+      
+      delete = compare.getDelete()
 
       self.printTable(delete)
       # save it
@@ -260,27 +251,10 @@ class O365():
 
       console = Console()
       console.print(table)
+      
+    
 
-    def compare(self, aUser, sUser):
-      """ compare Azure User against sUser """
-      avorname = aUser.vorname
-      anachname = aUser.nachname
-
-      svorname = sUser.vorname
-      snachname = sUser.nachname
-
-      if avorname.lower() == svorname.lower() and anachname.lower() == snachname.lower():
-        return True
-      # Vor-Nachname tauschen
-      if avorname.lower() == snachname.lower() and anachname.lower() == svorname.lower():
-        return True
-      return False
-
-    #!!!!!!!!!!!! ó = o
-    # VIPS fehlen# H.Dietl-L	Johannes	STANDARDWOFFPACK_IW_FACULTY
-    # Odegaard      Doppelnamen
-    # Paulina Lara  Doppelnamen
-    # Zalan > Zalán
+    
 
 
 

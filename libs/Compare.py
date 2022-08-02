@@ -5,6 +5,8 @@ import threading
 from multiprocessing import Lock
 import time
 import sys
+import re
+from pickle import TRUE
 
     # VIPS fehlen# H.Dietl-L  Johannes  STANDARDWOFFPACK_IW_FACULTY
     # Odegaard      Doppelnamen
@@ -75,6 +77,54 @@ class Compare():
       if avorname.lower() == snachname.lower() and anachname.lower() == svorname.lower():
         return True
       return False
+    
+    def compareDoubleNames(self, avorname, anachname, svorname, snachname):
+      """ vergl, Vor und Nachnamen auf Doppelname und auch mit tauschen 
+      # Nachname Doppelname
+        Steiner Pérez
+        Schönfelder-Kickinger
+      """
+      if "diego" == avorname.lower():
+        if "diego" == svorname.lower():
+          k = 0
+          STICHTAG nach ENtscheidungsprüfungen ....?
+          
+          
+          
+      if avorname.lower() in svorname.lower() and anachname.lower() in snachname.lower():
+        return True 
+      if avorname.lower() in snachname.lower() and anachname.lower() in svorname.lower():
+        return True
+      # split Doppelname
+      nachnamepart = False
+      parts = re.split(' |-', anachname)
+      if len(parts) > 1:
+        for p in parts:
+          # check in Nachname Sokrates
+          if p.lower() in snachname.lower():
+            nachnamepart = True
+            break
+      # Vorname -----
+      parts = re.split(' |-', avorname)
+      vornameepart = False
+      if len(parts) > 1:
+        for p in parts:
+          # check in Nachname Sokrates
+          if p.lower() in svorname.lower():
+            vornameepart = True
+            break
+          
+      # Falls Vor und Nachname passen dann treffer
+      if vornameepart is True and nachnamepart is True:
+        return True
+          
+      
+      
+      return False
+      
+      
+    
+    
 
     def run(self):
       """ compare Azure User against Sokrates User """
@@ -104,9 +154,13 @@ class Compare():
             anachname = self.normalize(aUser.nachname)
             svorname = self.normalize(sUser.vorname)
             snachname = self.normalize(sUser.nachname)
-            if self.compareNames(avorname, anachname, svorname, snachname):
+            if self.compareDoubleNames(avorname, anachname, svorname, snachname):
               found = True
               break
+            
+            
+        
+
 
         if found is False:
           # gibt es nicht mehr
@@ -118,7 +172,7 @@ class Compare():
       
       
       
-      # Nachname Doppelname
+      
       
       
       
